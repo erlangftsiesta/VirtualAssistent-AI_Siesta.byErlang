@@ -6,7 +6,7 @@ import subprocess
 import os
 
 # Setup kunci API
-openai.api_key = "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"
+openai.api_key = "UR OPEN API KEY"
 
 def speech_to_text():
     recognizer = sVoice.Recognizer()

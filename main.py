@@ -8,7 +8,7 @@ import subprocess #ini sistem (ikutin aja la)
 import os #ini sistem (ikutin aja la)
 
 # Setup kunci API OpenAI
-openai.api_key = "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"
+openai.api_key = "YOUR OPENAI API KEY"
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth

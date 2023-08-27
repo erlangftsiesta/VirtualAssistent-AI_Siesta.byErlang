@@ -1,12 +1,32 @@
-import speech_recognition as sVoice
-import pyttsx3
-import pywhatkit as kit
-import openai
-import subprocess
-import os
+import speech_recognition as sVoice #ini yang bikin AI kenal suara kita yang diconversi jadi teks
+import pyttsx3 #pokoknya import aja
+import spotipy # ini tuh buat nyambungin API Spotify (tapi gw belum test langsung. Jadi gue taro library nya dulu aja)
+from spotipy.oauth2 import SpotifyOAuth #ini gue lupa buat apa, tapi kayaknya Library lain bawaan Spotipy. Udahhh, install ajahhh
+import pywhatkit as kit #ini buat perintah dimana kita itu bisa buka ini buka itu kek buka yt, buka dll lah
+import openai #ini paling utama banget, soalnya ini tuh AI nya
+import subprocess #ini sistem (ikutin aja la)
+import os #ini sistem (ikutin aja la)
 
-# Setup kunci API
-openai.api_key = "UR OPEN API KEY"
+# Setup kunci API OpenAI
+openai.api_key = "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"
+
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
+# Setup koneksi dengan Spotify API
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id='af69d612b4b147e4aae30af4fcb6f0b9',
+                                               client_secret='b36f44c719a54a13876dcaef58f626d2',
+                                               redirect_uri='https://github.com/erlangftsiesta',
+                                               scope='user-library-read user-read-playback-state user-modify-playback-state'))
+
+def play_spotify_track(track_name):
+    results = sp.search(q=track_name, type='track')
+    if results['tracks']['items']:
+        track_uri = results['tracks']['items'][0]['uri']
+        sp.start_playback(uris=[track_uri])
+        print(f"Memutar lagu: {results['tracks']['items'][0]['name']}")
+    else:
+        print("Lagu tidak ditemukan.")
 
 def speech_to_text():
     recognizer = sVoice.Recognizer()
@@ -64,28 +84,42 @@ if __name__ == "__main__":
             input_pengguna = speech_to_text()
 
             if input_pengguna:
-                if "stop" in input_pengguna.lower():
+                if "stop" in input_pengguna.lower(): #membuat program memasuki mode standby untuk mendengarkan perintah selanjutnya
                     print("Menghentikan sistem.")
                     text_to_speech("Selamat tinggal!")
                     wait_for_trigger("Halo Siesta")  # Menunggu trigger untuk mengaktifkan kembali
+
                 elif "buka spotify" in input_pengguna.lower():
                     print("Membuka Spotify...")
                     text_to_speech("Membuka Spotify...")
                     kit.playonyt("Spotify")  # Membuka Spotify di YouTube
-                elif "buka youtube" in input_pengguna.lower():
-                    print("Membuka YouTube...")
-                    text_to_speech("Membuka YouTube...")
-                    kit.playonyt("YouTube")  # Membuka YouTube di browser
-                elif "buka instagram" in input_pengguna.lower():
-                    print("Membuka Instagram...")
-                    text_to_speech("Membuka Instagram...")
-                    kit.search("Instagram")  # Mencari Instagram di browser
 
+                elif "buka youtube" in input_pengguna.lower():
+                    search_query = input_pengguna.replace("cari di youtube", "")
+                    print("Mencari di YouTube:", search_query)
+                    text_to_speech(f"Mencari di YouTube: {search_query}")
+                    kit.playonyt(search_query)  # Mencari di YouTube
+
+                elif "cari data" in input_pengguna.lower():
+                    search_query = input_pengguna.replace("cari di internet", "")
+                    print("Mencari Data di Internet:", search_query)
+                    text_to_speech(f"Perintah disimpan, mencari data: {search_query}")
+                    kit.search(search_query)  # Mencari Instagram di browser
+
+                elif "setel lagu" in input_pengguna.lower():
+                    search_query = input_pengguna.replace("Cari di Spotify", "")
+                    print("Memutar lagu di Spotify:", search_query)
+                    play_spotify_track("Shape of You Ed Sheeran")
+                elif "turn off system" in input_pengguna.lower():
+                    print("System akan dimatikan")
+                    text_to_speech("System will be Shutdown!, have a nice day!")
+                    os._exit(0)
             else:
                 print("Berbincang dengan AI...")
                 respons_gpt = chat_dengan_gpt(input_pengguna)
                 print("Respons AI:", respons_gpt)
                 text_to_speech(respons_gpt)
+            
 
 
 
